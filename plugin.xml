@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.megaphone.cordova.contactLookup" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>contact-lookup</name>
+    <author>Elliot Stokes</author>
+
+    <engines>
+      <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+
+    <js-module name="ContactLookup" src="www/contact-lookup.js">
+        <clobbers target="cordova.plugins.contactLookup" />
+    </js-module>
+
+    <platform name="ios">
+      <header-file src="src/ios/CordovaIntercom.h" />
+      <source-file src="src/ios/CordovaIntercom.m" />
+
+      <config-file target="config.xml" parent="*/">
+        <feature name="ContactLookup">
+          <param name="ios-package" value="ContactLookup" />
+        </feature>
+      </config-file>
+
+      <framework src="AddressBook.framework" weak="true" />
+    </platform>
+</plugin>
