@@ -12,6 +12,17 @@
         <clobbers target="cordova.plugins.contactLookup" />
     </js-module>
 
+    <platform name="android">
+      <config-file target="res/xml/config.xml" parent="/*">
+        <feature name="ContactLookup">
+           <param name="android-package" value="com.megaphone.cordova.contacts.ContactLookup"/>
+        </feature>
+      </config-file>
+
+      <source-file src="src/android/ContactLookup.java" target-dir="src/com/megaphone/cordova/contacts"/>
+      <source-file src="src/android/ContactManager.java" target-dir="src/com/megaphone/cordova/contacts"/>
+    </platform>
+
     <platform name="ios">
       <header-file src="src/ios/CordovaIntercom.h" />
       <source-file src="src/ios/CordovaIntercom.m" />
