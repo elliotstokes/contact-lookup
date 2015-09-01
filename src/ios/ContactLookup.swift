@@ -12,6 +12,7 @@ import AddressBook
 @objc(ContactLookup) class ContactLookup : CDVPlugin {
     var numberFormatter = MPPhoneNumberFormatter()
     var command = CDVInvokedUrlCommand()
+    let addressBook: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
 
     func lookupContact(command: CDVInvokedUrlCommand) {
         self.command = command
@@ -35,14 +36,12 @@ import AddressBook
     }
 
     private func setupAddressBookWithCompletion(completion: (ABAddressBookRef?) -> Void) {
-        let addressBook: ABAddressBookRef = ABAddressBookCreateWithOptions(nil, nil).takeRetainedValue()
-        
         ABAddressBookRequestAccessWithCompletion(addressBook) {
             (granted, error) -> Void in
             if (error != nil) {
                 completion(nil)
             } else {
-                completion(addressBook)
+                completion(self.addressBook)
             }
         }
     }

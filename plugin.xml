@@ -21,6 +21,7 @@
       <config-file target="config.xml" parent="*/">
         <feature name="ContactLookup">
           <param name="ios-package" value="ContactLookup" />
+          <param name="onload" value="true" />
         </feature>
       </config-file>
     </platform>
