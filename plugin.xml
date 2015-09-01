@@ -1,15 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.megaphone.cordova.contactLookup" version="0.1.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
-    <name>contact-lookup</name>
+<plugin id="com.megaphone.cordova.ContactLookup" version="0.1.0" xmlns="http://www.phonegap.com/ns/plugins/1.0" >
+    <name>ContactLookup</name>
     <author>Elliot Stokes</author>
 
     <engines>
       <engine name="cordova" version=">=3.0.0" />
     </engines>
 
-
-    <js-module name="ContactLookup" src="www/contact-lookup.js">
-        <clobbers target="cordova.plugins.contactLookup" />
+    <js-module name="ContactLookup" src="www/ContactLookup.js">
+        <clobbers target="cordova.plugins.ContactLookup" />
     </js-module>
 
     <platform name="android">
@@ -25,15 +24,19 @@
     </platform>
 
     <platform name="ios">
-      <header-file src="src/ios/CordovaIntercom.h" />
-      <source-file src="src/ios/CordovaIntercom.m" />
+      <hook type="after_plugin_install" src="hooks/add_swift_support.js" />
 
-      <config-file target="config.xml" parent="*/">
+      <header-file src="src/ios/cordova-plugin-ContactLookup-Bridging-Header.h" />
+      <source-file src="src/ios/ContactLookup.swift" />
+      <source-file src="src/ios/MPContact.swift" />
+      <source-file src="src/ios/MPPhoneNumberFormatter.swift" />
+      <framework src="AddressBook.framework" weak="true" />
+
+      <config-file target="config.xml" parent="/*">
         <feature name="ContactLookup">
           <param name="ios-package" value="ContactLookup" />
+          <param name="onload" value="true" />
         </feature>
       </config-file>
-
-      <framework src="AddressBook.framework" weak="true" />
     </platform>
 </plugin>
