@@ -16,9 +16,11 @@
 
       <header-file src="src/ios/cordova-plugin-ContactLookup-Bridging-Header.h" />
       <source-file src="src/ios/ContactLookup.swift" />
+      <source-file src="src/ios/MPContact.swift" />
+      <source-file src="src/ios/MPPhoneNumberFormatter.swift" />
       <framework src="AddressBook.framework" weak="true" />
 
-      <config-file target="config.xml" parent="*/">
+      <config-file target="config.xml" parent="/*">
         <feature name="ContactLookup">
           <param name="ios-package" value="ContactLookup" />
           <param name="onload" value="true" />
