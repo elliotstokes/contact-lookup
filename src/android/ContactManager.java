@@ -126,7 +126,7 @@ public class ContactManager {
                 return null;
             }
         }
-
+        photoCursor.close();
         return photoUri.toString();
 	}
 }
