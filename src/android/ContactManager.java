@@ -64,6 +64,7 @@ public class ContactManager {
 
                 	currentContactId = contactId;
                 	newContact = true;
+                    foundContact = false;
                 }
 
                 if (newContact) {
