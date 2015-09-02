@@ -32,7 +32,6 @@ public class ContactManager {
 		JSONArray contactNumbers = new JSONArray();
 
         JSONObject contact = new JSONObject();
-
 	    Cursor cur = mApp.getActivity().getContentResolver().query(
 	    	ContactsContract.Data.CONTENT_URI,
 	    	columns,
@@ -58,12 +57,19 @@ public class ContactManager {
 
                 if (!currentContactId.equals(contactId)) {
                 	if (foundContact) {
+                        String photo = getPhotoUri(currentContactId);
+                        if (photo != null) {
+                            contact.put("photo", photo);
+                        } else {
+                            contact.put("photo", JSONObject.NULL);
+                        }
                 		contact.put("phoneNumbers", contactNumbers);
                 		contacts.put(contact);                		
                 	}
 
                 	currentContactId = contactId;
                 	newContact = true;
+                    foundContact = false;
                 }
 
                 if (newContact) {
@@ -83,15 +89,6 @@ public class ContactManager {
             			foundContact = true;
             		}
             	} 
-
-            	String photo = getPhotoUri(contactId);
-            	if (photo != null) {
-					contact.put("photo", photo);
-            	} else {
-            		contact.put("photo", JSONObject.NULL);
-            	}
-            	
-	            
 	        }
 	    }
         cur.close();
@@ -125,7 +122,7 @@ public class ContactManager {
                 return null;
             }
         }
-
+        photoCursor.close();
         return photoUri.toString();
 	}
 }
