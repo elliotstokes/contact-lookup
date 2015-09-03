@@ -30,7 +30,7 @@ public class ContactLookup extends CordovaPlugin {
         }
 
         JSONArray numbers = args.optJSONArray(0);
-        String countryCode = args.optString(1);
+        final String countryCode = args.optString(1);
 
         contactManager = new ContactManager(this.cordova);
 
@@ -45,7 +45,7 @@ public class ContactLookup extends CordovaPlugin {
 
 					JSONArray contacts = null;
 					try {
-						contacts = contactManager.search(list);
+						contacts = contactManager.search(list, countryCode);
 					} catch (Exception ex) {
 						Log.d("CONTACT_LOOKUP", "Error searching contacts");
 					}
