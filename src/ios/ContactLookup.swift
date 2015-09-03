@@ -31,7 +31,7 @@ import AddressBook
                 
                 self.setupAddressBookWithCompletion { (addressBookRef) in
                     if let addressBook: ABAddressBookRef = addressBookRef {
-                        let contacts = self.searchContactsIn(addressBook, forPhoneNumbers: phoneNumbers)
+                        let contacts = self.searchContactsForPhoneNumbers(phoneNumbers)
                         let responseArray = contacts.map { $0.dictionaryRepresentation }
                         self.sendPluginResponse(responseArray)
                     } else {
@@ -64,36 +64,37 @@ import AddressBook
         }
     }
     
-    private func searchContactsIn(addressBook: ABAddressBookRef, forPhoneNumbers phoneNumbers: [String]) -> [MPContact] {
-        let people = ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue() as [ABRecord]
-        let searchSet = Set(phoneNumbers)
-        var response = [MPContact]()
-        for person: ABRecord in people {
-            let newPerson = MPContact(fromRecord: person, withNumberFormatter: numberFormatter)
-            if newPerson.canMatchPhoneNumbers(searchSet) {
-                if newPerson.hasImage { newPerson.fetchImageData() }
-                response.append(newPerson)
+    private func searchContactsForPhoneNumbers(phoneNumbers: [String]) -> [MPContact] {
+        return synchronize(self) {
+            let people = ABAddressBookCopyArrayOfAllPeople(self.addressBook!).takeRetainedValue() as [ABRecord]
+            let searchSet = Set(phoneNumbers)
+            var response = [MPContact]()
+            for person: ABRecord in people {
+                let newPerson = MPContact(fromRecord: person, withNumberFormatter: self.numberFormatter)
+                if newPerson.canMatchPhoneNumbers(searchSet) {
+                    if newPerson.hasImage { newPerson.fetchImageData() }
+                    response.append(newPerson)
+                }
             }
+            return response
         }
-        return response
+    }
+    
+    private func synchronize<T>(lockObj: AnyObject!, closure: ()->T) -> T {
+        objc_sync_enter(lockObj)
+        var returnValue: T = closure()
+        objc_sync_exit(lockObj)
+        return returnValue
     }
     
     private func sendPluginResponse(response: [AnyObject]) {
-        let pluginResult = pluginResponseFrom(response)
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId:command.callbackId)
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsArray: response)
+        self.commandDelegate.sendPluginResult(pluginResult, callbackId: command.callbackId)
     }
     
     private func sendPluginResponse(#error: [String: AnyObject]) {
-        let pluginResult = pluginErrorResponseFrom(error)
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId:command.callbackId)
-    }
-    
-    private func pluginResponseFrom(response: [AnyObject]) -> CDVPluginResult {
-        return CDVPluginResult(status: CDVCommandStatus_OK, messageAsArray: response)
-    }
-    
-    private func pluginErrorResponseFrom(error: [String: AnyObject]) -> CDVPluginResult {
-        return CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsDictionary: error)
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsDictionary: error)
+        self.commandDelegate.sendPluginResult(pluginResult, callbackId: command.callbackId)
     }
  
 }
