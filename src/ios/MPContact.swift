@@ -95,6 +95,10 @@ class MPContact: Printable {
         }
     }
     
+    func canMatchPhoneNumbers(numbers: Set<String>) -> Bool {
+        return phoneNumbers.intersect(numbers).count > 0
+    }
+    
     private func getPNGImageForRecord(record: ABRecord) -> NSData {
         let data = ABPersonCopyImageDataWithFormat(record, kABPersonImageFormatThumbnail).takeRetainedValue()
         return UIImagePNGRepresentation( UIImage(data: data) )

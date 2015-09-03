@@ -11,9 +11,9 @@ import Foundation
 class MPPhoneNumberFormatter {
     var countryCode: String = "44"
     
-    private var nonDigitCharSet : NSCharacterSet {
+    private let nonDigitCharSet: NSCharacterSet = {
         return NSCharacterSet.decimalDigitCharacterSet().invertedSet
-    }
+    }()
     
     init() { }
     
