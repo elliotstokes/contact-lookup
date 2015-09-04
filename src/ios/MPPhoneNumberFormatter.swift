@@ -21,12 +21,15 @@ class MPPhoneNumberFormatter {
         self.countryCode = code
     }
     
-    func format(number: String) -> String {
+    func format(number: String) -> String? {
         var output = number
         if number.hasPrefix("00") {
             output = substring(number, fromIndex: 2)
         }
         output = "".join(output.componentsSeparatedByCharactersInSet(nonDigitCharSet))
+        if  count(output) == 0 {
+            return nil
+        }
         
         if !number.hasPrefix("+") {
             var initialIndex = 0
@@ -35,6 +38,7 @@ class MPPhoneNumberFormatter {
             case "99": initialIndex = output.hasPrefix("99") ? 2 : 0
             default: break
             }
+            
             output = countryCode + substring(output, fromIndex: initialIndex)
         }
         

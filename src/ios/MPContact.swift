@@ -57,18 +57,25 @@ class MPContact: Printable {
         
         // ID
         self.recordID = ABRecordGetRecordID(record)
-        
         // Name
         self.numberFormatter = numberFormatter
-        self.name = ABRecordCopyCompositeName(record).takeRetainedValue() as String
+        if let nameRecord = ABRecordCopyCompositeName(record) {
+             self.name = nameRecord.takeRetainedValue() as String
+        } else {
+            self.name = ""
+        }
         
         // Phone Numbers
-        let numbers : ABMultiValueRef = ABRecordCopyValue(record, kABPersonPhoneProperty).takeRetainedValue()
-        for var index = 0; index < ABMultiValueGetCount(numbers); ++index {
-            let number: AnyObject = ABMultiValueCopyValueAtIndex(numbers, index).takeRetainedValue()
-            let newNumber = numberFormatter.format(number as! String)
-            
-            self.phoneNumbers.insert(newNumber)
+        if let numbersRecord = ABRecordCopyValue(record, kABPersonPhoneProperty) {
+            let numbers : ABMultiValueRef = numbersRecord.takeRetainedValue()
+            for var index = 0; index < ABMultiValueGetCount(numbers); ++index {
+                let number: AnyObject = ABMultiValueCopyValueAtIndex(numbers, index).takeRetainedValue()
+                let newNumber = numberFormatter.format(number as! String)
+                if let formattedNumber = newNumber {
+                    self.phoneNumbers.insert(formattedNumber)
+                }
+            }
+
         }
         
         // Profile Picture
