@@ -10,6 +10,7 @@ import Foundation
 import AddressBook
 
 class MPContact: Printable {
+    // MARK: - Properties
     let recordID: Int32
     let name: String
     let numberFormatter: MPPhoneNumberFormatter
@@ -52,36 +53,43 @@ class MPContact: Printable {
         }
     }
     
+    // MARK: - Class Methods
+
+    private class func nameForRecord(record: ABRecord) -> String {
+        return ABRecordCopyCompositeName(record)?.takeRetainedValue() as? String ?? ""
+    }
+    
+    private class func phoneNumberRecordsFrom(record: ABRecord) -> ABMultiValueRef? {
+        return ABRecordCopyValue(record, kABPersonPhoneProperty)?.takeRetainedValue() as ABMultiValueRef?
+    }
+    
+    // MARK: - Initialisation
     init(fromRecord record: ABRecord, withNumberFormatter numberFormatter: MPPhoneNumberFormatter) {
         self.record = record
+        self.numberFormatter = numberFormatter
         
         // ID
         self.recordID = ABRecordGetRecordID(record)
+        
         // Name
-        self.numberFormatter = numberFormatter
-        if let nameRecord = ABRecordCopyCompositeName(record) {
-             self.name = nameRecord.takeRetainedValue() as String
-        } else {
-            self.name = ""
-        }
+        self.name = MPContact.nameForRecord(record)
         
         // Phone Numbers
-        if let numbersRecord = ABRecordCopyValue(record, kABPersonPhoneProperty) {
-            let numbers : ABMultiValueRef = numbersRecord.takeRetainedValue()
+        if let numbers: ABMultiValueRef = MPContact.phoneNumberRecordsFrom(record) {
             for var index = 0; index < ABMultiValueGetCount(numbers); ++index {
                 let number: AnyObject = ABMultiValueCopyValueAtIndex(numbers, index).takeRetainedValue()
-                let newNumber = numberFormatter.format(number as! String)
-                if let formattedNumber = newNumber {
+                if let formattedNumber = numberFormatter.format(number as! String) {
                     self.phoneNumbers.insert(formattedNumber)
                 }
             }
-
         }
         
         // Profile Picture
         self.hasImage = ABPersonHasImageData(record)
     }
     
+    // MARK: - Instance Methods
+
     func fetchImageData() {
         let hashString = "\(hashValue)"
         
@@ -106,6 +114,8 @@ class MPContact: Printable {
         return phoneNumbers.intersect(numbers).count > 0
     }
     
+    // MARK: - Private Methods
+
     private func getPNGImageForRecord(record: ABRecord) -> NSData {
         let data = ABPersonCopyImageDataWithFormat(record, kABPersonImageFormatThumbnail).takeRetainedValue()
         return UIImagePNGRepresentation( UIImage(data: data) )
@@ -138,7 +148,8 @@ class MPContact: Printable {
         }
     }
     
-    struct DataStore {
+    // MARK: - Data Storage
+    private struct DataStore {
         private static let cachedImageKey = "savedContactImages"
         
         static var savedImages: [String]? {

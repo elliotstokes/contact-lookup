@@ -70,7 +70,6 @@ import AddressBook
             let searchSet = Set(phoneNumbers)
             var response = [MPContact]()
             for person: ABRecord in people {
-
                 let newPerson = MPContact(fromRecord: person, withNumberFormatter: self.numberFormatter)
                 if newPerson.canMatchPhoneNumbers(searchSet) {
                     if newPerson.hasImage { newPerson.fetchImageData() }
