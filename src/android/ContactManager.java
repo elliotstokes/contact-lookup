@@ -82,11 +82,14 @@ public class ContactManager {
                 if (mimetype.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
                     contact.put("name", cur.getString(colDisplayName));
                 } else if (mimetype.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
-                    String telNo = sanitiseNumber(cur.getString(colPhoneNumber),countryCode);
-                    contactNumbers.put(telNo);
-                    //check number exists
-                    if (numbers.indexOf(telNo) >=0) {
-                        foundContact = true;
+                    String possibleNumber = cur.getString(colPhoneNumber);
+                    if (possibleNumber != null) {
+                        String telNo = sanitiseNumber(possibleNumber,countryCode);
+                        contactNumbers.put(telNo);
+                        //check number exists
+                        if (numbers.indexOf(telNo) >=0) {
+                            foundContact = true;
+                        }
                     }
                 } 
             }
@@ -104,18 +107,18 @@ public class ContactManager {
     private String sanitiseNumber(String number, String countryCode) {
         String zerodNo = number.replaceAll("^00", "+");
         number = zerodNo.replaceAll("\\D", "");
+        if (number.length() >= 2) {
+            if (zerodNo.charAt(0) != '+') {
+                int fromIndex = 0;
+                String startDigits = number.substring(0,2);
+                if (countryCode.equals("44")) {
+                    fromIndex = (startDigits.equals("44")) ? 2 : 1;
+                } else if (countryCode.equals("99")) {
+                    fromIndex = (startDigits.equals("99")) ? 2 : 0;
+                }
 
-        if (zerodNo.charAt(0) != '+') {
-        
-            int fromIndex = 0;
-            String startDigits = number.substring(0,2);
-            if (countryCode.equals("44")) {
-                fromIndex = (startDigits.equals("44")) ? 2 : 1;
-            } else if (countryCode.equals("99")) {
-                fromIndex = (startDigits.equals("99")) ? 2 : 0;
+                number = countryCode + number.substring(fromIndex);
             }
-
-            number = countryCode + number.substring(fromIndex);
         }
 
         return number;
