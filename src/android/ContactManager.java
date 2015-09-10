@@ -19,6 +19,7 @@ public class ContactManager {
     }
 
     public JSONArray search(ArrayList<String> numbers, String countryCode) throws JSONException {
+        
         String[] columns = new String[] {
             ContactsContract.Data.CONTACT_ID, ContactsContract.Data.MIMETYPE, 
             ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, 
@@ -29,82 +30,92 @@ public class ContactManager {
         String query = ContactsContract.CommonDataKinds.Phone.NUMBER + " is not null";
 
         JSONArray contacts = new JSONArray();
-        JSONArray contactNumbers = new JSONArray();
 
-        JSONObject contact = new JSONObject();
-        Cursor cur = mApp.getActivity().getContentResolver().query(
-            ContactsContract.Data.CONTENT_URI,
-            columns,
-            query,
-            null,
-            ContactsContract.Data.CONTACT_ID + " ASC");
+        try {
 
-        int colContactId = cur.getColumnIndex(ContactsContract.Data.CONTACT_ID);
-        int colDisplayName = cur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
-        int colPhoneNumber = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-        int colMimetype = cur.getColumnIndex(ContactsContract.Data.MIMETYPE);
-        String currentContactId = "";
-        boolean newContact = true;
-        boolean foundContact = false;
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
 
-                String contactId = cur.getString(colContactId);
-                String mimetype = cur.getString(colMimetype);
-                if (cur.getPosition() == 0) {
-                    currentContactId = contactId;
-                }
 
-                if (!currentContactId.equals(contactId)) {
-                    if (foundContact) {
-                        String photo = getPhotoUri(currentContactId);
-                        if (photo != null) {
-                            contact.put("photo", photo);
-                        } else {
-                            contact.put("photo", JSONObject.NULL);
-                        }
-                        contact.put("phoneNumbers", contactNumbers);
-                        contacts.put(contact);                      
+            JSONArray contactNumbers = new JSONArray();
+            JSONObject contact = new JSONObject();
+            Cursor cur = mApp.getActivity().getContentResolver().query(
+                ContactsContract.Data.CONTENT_URI,
+                columns,
+                query,
+                null,
+                ContactsContract.Data.CONTACT_ID + " ASC");
+
+            int colContactId = cur.getColumnIndex(ContactsContract.Data.CONTACT_ID);
+            int colDisplayName = cur.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME);
+            int colPhoneNumber = cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            int colMimetype = cur.getColumnIndex(ContactsContract.Data.MIMETYPE);
+            String currentContactId = "";
+            boolean newContact = true;
+            boolean foundContact = false;
+            if (cur.getCount() > 0) {
+                while (cur.moveToNext()) {
+
+                    String contactId = cur.getString(colContactId);
+                    String mimetype = cur.getString(colMimetype);
+                    if (cur.getPosition() == 0) {
+                        currentContactId = contactId;
                     }
 
-                    currentContactId = contactId;
-                    newContact = true;
-                    foundContact = false;
-                }
-
-                if (newContact) {
-                    contact = new JSONObject();
-                    contactNumbers = new JSONArray();
-                    contact.put("id", contactId);
-                    newContact = false;
-                }
-
-                if (mimetype.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
-                    contact.put("name", cur.getString(colDisplayName));
-                } else if (mimetype.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
-                    String possibleNumber = cur.getString(colPhoneNumber);
-                    if (possibleNumber != null) {
-                        String telNo = sanitiseNumber(possibleNumber,countryCode);
-                        contactNumbers.put(telNo);
-                        //check number exists
-                        if (numbers.indexOf(telNo) >=0) {
-                            foundContact = true;
+                    if (!currentContactId.equals(contactId)) {
+                        if (foundContact) {
+                            String photo = getPhotoUri(currentContactId);
+                            if (photo != null) {
+                                contact.put("photo", photo);
+                            } else {
+                                contact.put("photo", JSONObject.NULL);
+                            }
+                            contact.put("phoneNumbers", contactNumbers);
+                            contacts.put(contact);                      
                         }
+
+                        currentContactId = contactId;
+                        newContact = true;
+                        foundContact = false;
                     }
-                } 
+
+                    if (newContact) {
+                        contact = new JSONObject();
+                        contactNumbers = new JSONArray();
+                        contact.put("id", contactId);
+                        newContact = false;
+                    }
+
+                    if (mimetype.equals(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)) {
+                        contact.put("name", cur.getString(colDisplayName));
+                    } else if (mimetype.equals(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)) {
+                        String possibleNumber = cur.getString(colPhoneNumber);
+                        if (possibleNumber != null) {
+                            String telNo = sanitiseNumber(possibleNumber,countryCode);
+                            contactNumbers.put(telNo);
+                            //check number exists
+                            if (numbers.indexOf(telNo) >=0) {
+                                foundContact = true;
+                            }
+                        }
+                    } 
+                }
             }
-        }
-        cur.close();
+            cur.close();
 
-        if (foundContact) {
-            contact.put("phoneNumbers", contactNumbers);
-            contacts.put(contact);          
+            if (foundContact) {
+                contact.put("phoneNumbers", contactNumbers);
+                contacts.put(contact);          
+            }
+        } catch (Exception ex) {
+            Log.e("CONTACT_MANAGER", ex.getMessage());
         }
+
+
 
         return contacts;
     }
 
     private String sanitiseNumber(String number, String countryCode) {
+
         String zerodNo = number.replaceAll("^00", "+");
         number = zerodNo.replaceAll("\\D", "");
         if (number.length() >= 2) {
