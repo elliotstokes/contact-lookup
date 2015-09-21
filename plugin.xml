@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.megaphone.cordova.ContactLookup" version="0.2.1" xmlns="http://www.phonegap.com/ns/plugins/1.0" >
+<plugin id="com.megaphone.cordova.ContactLookup" version="0.2.2" xmlns="http://www.phonegap.com/ns/plugins/1.0" >
     <name>ContactLookup</name>
     <author>Elliot Stokes</author>
 
