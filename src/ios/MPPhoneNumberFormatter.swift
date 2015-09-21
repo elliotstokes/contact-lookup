@@ -26,7 +26,7 @@ class MPPhoneNumberFormatter {
         if number.hasPrefix("00") {
             output = substring(number, fromIndex: 2)
         }
-        output = "".join(output.componentsSeparatedByCharactersInSet(nonDigitCharSet))
+        output = output.componentsSeparatedByCharactersInSet(nonDigitCharSet).joinWithSeparator("")
         if output.isEmpty { return nil }
         
         if !number.hasPrefix("+") {
@@ -43,6 +43,6 @@ class MPPhoneNumberFormatter {
     }
     
     private func substring(string: String, fromIndex index: Int) -> String {
-        return string[advance(string.startIndex, index)..<string.endIndex]
+        return string[string.startIndex.advancedBy(index)..<string.endIndex]
     }
 }

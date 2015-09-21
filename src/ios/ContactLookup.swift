@@ -26,11 +26,11 @@ import AddressBook
         if let phoneNumbers = command.argumentAtIndex(0) as? [String],
            let countryCode = command.argumentAtIndex(1) as? String {
             
-            commandDelegate.runInBackground {
+            commandDelegate!.runInBackground {
                 self.numberFormatter = MPPhoneNumberFormatter(countryCode: countryCode)
                 
                 self.setupAddressBookWithCompletion { (addressBookRef) in
-                    if let addressBook: ABAddressBookRef = addressBookRef {
+                    if addressBookRef != nil {
                         let contacts = self.searchContactsForPhoneNumbers(phoneNumbers)
                         let responseArray = contacts.map { $0.dictionaryRepresentation }
                         self.sendPluginResponse(responseArray)
@@ -82,19 +82,19 @@ import AddressBook
     
     private func synchronize<T>(lockObj: AnyObject!, closure: ()->T) -> T {
         objc_sync_enter(lockObj)
-        var returnValue: T = closure()
+        let returnValue: T = closure()
         objc_sync_exit(lockObj)
         return returnValue
     }
     
     private func sendPluginResponse(response: [AnyObject]) {
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsArray: response)
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId: command.callbackId)
+        self.commandDelegate!.sendPluginResult(pluginResult, callbackId: command.callbackId)
     }
     
-    private func sendPluginResponse(#error: [String: AnyObject]) {
+    private func sendPluginResponse(error error: [String: AnyObject]) {
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsDictionary: error)
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId: command.callbackId)
+        self.commandDelegate!.sendPluginResult(pluginResult, callbackId: command.callbackId)
     }
  
 }

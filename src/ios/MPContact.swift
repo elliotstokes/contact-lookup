@@ -9,7 +9,7 @@
 import Foundation
 import AddressBook
 
-class MPContact: Printable {
+class MPContact: CustomStringConvertible {
     // MARK: - Properties
     let recordID: Int32
     let name: String
@@ -20,7 +20,7 @@ class MPContact: Printable {
     private let record: ABRecord
     
     var description: String {
-        return "\(name): " + ", ".join(phoneNumbers) + (hasImage ? " 📷" : "")
+        return "\(name): " + phoneNumbers.joinWithSeparator(", ") + (hasImage ? " 📷" : "")
     }
     
     var dictionaryRepresentation: [String: AnyObject] {
@@ -44,11 +44,12 @@ class MPContact: Printable {
     
     private var documentStoragePath: NSURL {
         let manager = NSFileManager()
-        let paths = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask) as! [NSURL]
+        let paths = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask) 
         let desiredURL = paths[0].URLByAppendingPathComponent("ContactCache")
-        if manager.createDirectoryAtURL(desiredURL, withIntermediateDirectories: true, attributes: nil, error: nil) {
+        do {
+            try manager.createDirectoryAtURL(desiredURL, withIntermediateDirectories: true, attributes: nil)
             return desiredURL
-        } else {
+        } catch _ {
             return paths[0]
         }
     }
@@ -105,7 +106,7 @@ class MPContact: Printable {
                 rememberSavedImageWithIdentifier(hashString)
                 setNoBackupFor(imageURL)
             } else {
-                println("not saved")
+                print("not saved")
             }
         }
     }
@@ -118,7 +119,7 @@ class MPContact: Printable {
 
     private func getPNGImageForRecord(record: ABRecord) -> NSData {
         let data = ABPersonCopyImageDataWithFormat(record, kABPersonImageFormatThumbnail).takeRetainedValue()
-        return UIImagePNGRepresentation( UIImage(data: data) )
+        return UIImagePNGRepresentation( UIImage(data: data)! )!
     }
     
     private func imagePathFor(identifier: String) -> String? {
@@ -127,13 +128,14 @@ class MPContact: Printable {
     }
     
     private func setNoBackupFor(imageURL: NSURL) {
-        var error: NSError? = nil
-        imageURL.setResourceValue(NSNumber(bool: true), forKey: NSURLIsExcludedFromBackupKey, error: &error)
+        do {
+            try imageURL.setResourceValue(NSNumber(bool: true), forKey: NSURLIsExcludedFromBackupKey)
+        } catch {}
     }
     
     private func hasSavedImage(imageRef: String) -> Bool {
         if let savedImages = DataStore.savedImages {
-            return contains(savedImages, imageRef)
+            return savedImages.contains(imageRef)
         } else {
             return false
         }
