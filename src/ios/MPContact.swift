@@ -57,7 +57,7 @@ class MPContact: CustomStringConvertible {
     // MARK: - Class Methods
 
     private class func nameForRecord(record: ABRecord) -> String {
-        return ABRecordCopyCompositeName(record)?.takeRetainedValue() as? String ?? ""
+        return ABRecordCopyCompositeName(record)?.takeRetainedValue() as String? ?? ""
     }
     
     private class func phoneNumberRecordsFrom(record: ABRecord) -> ABMultiValueRef? {
