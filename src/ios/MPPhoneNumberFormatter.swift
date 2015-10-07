@@ -8,6 +8,31 @@
 
 import Foundation
 
+enum CountryCode {
+    case Trunked(String)
+    case NonTrunked(String)
+    
+    private static let all: [CountryCode] = [
+        .Trunked("44"),
+        .Trunked("61"),
+        .Trunked("64"),
+        .Trunked("91"),
+        .Trunked("353"),
+        .NonTrunked("1")
+    ]
+    
+    static func fromCode(code: String) -> CountryCode? {
+        return self.all.filter { $0.hasCode(code) }.first
+    }
+    
+    private func hasCode(code: String) -> Bool {
+        switch self {
+        case .Trunked    (let cCode): return code == cCode
+        case .NonTrunked (let cCode): return code == cCode
+        }
+    }
+}
+
 class MPPhoneNumberFormatter {
     var countryCode: String = "44"
     
@@ -29,17 +54,28 @@ class MPPhoneNumberFormatter {
         output = output.componentsSeparatedByCharactersInSet(nonDigitCharSet).joinWithSeparator("")
         if output.isEmpty { return nil }
         
-        if !number.hasPrefix("+") {
+        if !number.hasPrefix("+") && !number.hasPrefix("00") {
             var initialIndex = 0
-            switch countryCode {
-            case "44": initialIndex = output.hasPrefix("44") ? 2 : 1
-            case "99": initialIndex = output.hasPrefix("99") ? 2 : 0
-            default: break
+            if let country = CountryCode.fromCode(countryCode) {
+                switch country {
+                case .Trunked(let code):    initialIndex = trunkedFirstIndexFor(output, with: code)
+                case .NonTrunked(let code): initialIndex = nonTrunkedFirstIndexFor(output, with: code)
+                }
             }
             output = countryCode + substring(output, fromIndex: initialIndex)
         }
         
         return output
+    }
+    
+    private func trunkedFirstIndexFor(output: String, with countryCode: String) -> Int {
+        if output.hasPrefix(countryCode) { return output.characters.count }
+        if output.hasPrefix("0") { return 1 }
+        return 0
+    }
+    
+    private func nonTrunkedFirstIndexFor(output: String, with countryCode: String) -> Int {
+        return output.hasPrefix(countryCode) ? output.characters.count : 0
     }
     
     private func substring(string: String, fromIndex index: Int) -> String {
