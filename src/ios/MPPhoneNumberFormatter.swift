@@ -13,12 +13,16 @@ enum CountryCode {
     case NonTrunked(String)
     
     private static let all: [CountryCode] = [
+        .Trunked("33"),
+        .Trunked("34"),
         .Trunked("44"),
+        .Trunked("49"),
         .Trunked("61"),
         .Trunked("64"),
         .Trunked("91"),
         .Trunked("353"),
-        .NonTrunked("1")
+        .NonTrunked("1"),
+        .NonTrunked("99")
     ]
     
     static func fromCode(code: String) -> CountryCode? {
