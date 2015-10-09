@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com.megaphone.cordova.ContactLookup" version="0.2.3" xmlns="http://www.phonegap.com/ns/plugins/1.0" >
+<plugin id="com.megaphone.cordova.ContactLookup" version="0.2.5" xmlns="http://www.phonegap.com/ns/plugins/1.0" >
     <name>ContactLookup</name>
     <author>Elliot Stokes</author>
 
@@ -20,6 +20,7 @@
 
       <source-file src="src/android/ContactLookup.java" target-dir="src/com/megaphone/cordova/contacts"/>
       <source-file src="src/android/ContactManager.java" target-dir="src/com/megaphone/cordova/contacts"/>
+      <source-file src="src/android/Countries.java" target-dir="src/com/megaphone/cordova/contacts"/>
     </platform>
 
     <platform name="ios">

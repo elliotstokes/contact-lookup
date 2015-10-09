@@ -122,10 +122,11 @@ public class ContactManager {
             if (zerodNo.charAt(0) != '+') {
                 int fromIndex = 0;
                 String startDigits = number.substring(0,2);
-                if (countryCode.equals("44")) {
-                    fromIndex = (startDigits.equals("44")) ? 2 : 1;
-                } else if (countryCode.equals("99")) {
-                    fromIndex = (startDigits.equals("99")) ? 2 : 0;
+                
+                if (Countries.getTrunked().contains(countryCode)) {
+                    fromIndex = Countries.calculateTrunkedFirstIndex(countryCode, number);
+                } else if (Countries.getNonTrunked().contains(countryCode)) {
+                    fromIndex = Countries.calculateNonTrunkedFirstIndex(countryCode, number);
                 }
 
                 number = countryCode + number.substring(fromIndex);
