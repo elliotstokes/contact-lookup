@@ -39,4 +39,17 @@
         </feature>
       </config-file>
     </platform>
+
+    <platform name="wp8">
+        <config-file target="config.xml" parent="/*">
+            <feature name="ContactLookup">
+                <param name="wp-package" value="ContactLookup"/>
+            </feature>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_CONTACTS" />
+        </config-file>
+
+    </platform>
 </plugin>
