@@ -21,6 +21,8 @@ enum CountryCode {
         .Trunked("64"),
         .Trunked("91"),
         .Trunked("353"),
+        .Trunked("971"),
+        .Trunked("972"),
         .NonTrunked("1"),
         .NonTrunked("99")
     ]
