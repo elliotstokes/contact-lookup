@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Countries {
 
-	private static ArrayList<String> trunked = new ArrayList<String> (Arrays.asList("33","34", "44", "49", "61", "64", "91", "353"));
+	private static ArrayList<String> trunked = new ArrayList<String> (Arrays.asList("33", "34", "44", "49", "61", "64", "91", "353", "971", "972"));
 	private static ArrayList<String> nonTrunked = new ArrayList<String> (Arrays.asList("1"));
 	// private static ArrayList<String> all = null;
 	
