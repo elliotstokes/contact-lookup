@@ -12,13 +12,20 @@ import AddressBook
 @objc(ContactLookup) class ContactLookup : CDVPlugin {
     var numberFormatter = MPPhoneNumberFormatter()
     var command = CDVInvokedUrlCommand()
-    let addressBook: ABAddressBookRef? = {
+    var addressBook: ABAddressBookRef?
+    
+    override func pluginInitialize() {
+        super.pluginInitialize()
+        
+        numberFormatter = MPPhoneNumberFormatter()
+        command = CDVInvokedUrlCommand()
+        
         if let abRef = ABAddressBookCreateWithOptions(nil, nil) {
-            return abRef.takeRetainedValue()
+            addressBook = abRef.takeRetainedValue()
         } else {
-            return nil
+            addressBook = nil
         }
-    }()
+    }
 
     func lookupContacts(command: CDVInvokedUrlCommand) {
         self.command = command
@@ -48,9 +55,10 @@ import AddressBook
         let authStatus = ABAddressBookGetAuthorizationStatus()
         
         switch authStatus {
-        case .Authorized:          completion(addressBook!)
+        
         case .Denied, .Restricted: completion(nil)
         case .NotDetermined:       requestAddressBookAccessWithCompletion(completion)
+        case .Authorized:          completion(addressBook!)
         }
     }
     
@@ -94,7 +102,7 @@ import AddressBook
     
     private func sendPluginResponse(error error: [String: AnyObject]) {
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAsDictionary: error)
-        self.commandDelegate!.sendPluginResult(pluginResult, callbackId: command.callbackId)
+        self.commandDelegate?.sendPluginResult(pluginResult, callbackId: command.callbackId)
     }
  
 }
