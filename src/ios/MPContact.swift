@@ -77,7 +77,7 @@ class MPContact: CustomStringConvertible {
         
         // Phone Numbers
         if let numbers: ABMultiValueRef = MPContact.phoneNumberRecordsFrom(record) {
-            for var index = 0; index < ABMultiValueGetCount(numbers); ++index {
+            for index in 0..<ABMultiValueGetCount(numbers) {
                 let number: AnyObject = ABMultiValueCopyValueAtIndex(numbers, index).takeRetainedValue()
                 if let formattedNumber = numberFormatter.format(number as! String) {
                     self.phoneNumbers.insert(formattedNumber)
