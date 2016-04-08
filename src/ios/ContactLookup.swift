@@ -55,7 +55,6 @@ import AddressBook
         let authStatus = ABAddressBookGetAuthorizationStatus()
         
         switch authStatus {
-        
         case .Denied, .Restricted: completion(nil)
         case .NotDetermined:       requestAddressBookAccessWithCompletion(completion)
         case .Authorized:          completion(addressBook!)
